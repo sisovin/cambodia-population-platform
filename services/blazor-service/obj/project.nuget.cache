@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "Zi5BjvSz1wQ=",
+  "success": true,
+  "projectFilePath": "D:\\laragon\\www\\cambodia-population-platform\\services\\blazor-service\\blazor-service.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\sisov\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.9\\microsoft.aspnetcore.openapi.9.0.9.nupkg.sha512",
+    "C:\\Users\\sisov\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512",
+    "C:\\Users\\sisov\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.23.0-preview.4\\microsoft.visualstudio.azure.containers.tools.targets.1.23.0-preview.4.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,17 @@
+{
+    "extends": "@workspace/typescript-config/base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true,
+        "declarationMap": true
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

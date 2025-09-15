@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # Database
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: population
+      POSTGRES_USER: population_user
+      POSTGRES_PASSWORD: population_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # Frontend applications
+  public-site:
+    build:
+      context: .
+      dockerfile: ./apps/public-site/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - API_BASE_URL=http://api-gateway:3001/api
+    depends_on:
+      - api-gateway
+    volumes:
+      - ./apps/public-site:/app
+      - /app/node_modules
+
+  registrar-app:
+    build:
+      context: .
+      dockerfile: ./apps/registrar-app/Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      - API_BASE_URL=http://api-gateway:3001/api
+    depends_on:
+      - api-gateway
+
+  # Backend services
+  node-service:
+    build:
+      context: .
+      dockerfile: ./services/node-service/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=population
+      - DB_USER=population_user
+      - DB_PASSWORD=population_pass
+      - JWT_SECRET=your-jwt-secret
+    depends_on:
+      - postgres
+    volumes:
+      - ./services/node-service:/app
+      - /app/node_modules
+
+  php-service:
+    build:
+      context: .
+      dockerfile: ./services/php-service/Dockerfile
+    ports:
+      - "9000:80"
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=population
+      - DB_USER=population_user
+      - DB_PASSWORD=population_pass
+    depends_on:
+      - postgres
+
+  python-service:
+    build:
+      context: .
+      dockerfile: ./services/python-service/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=population
+      - DB_USER=population_user
+      - DB_PASSWORD=population_pass
+      - NCDD_API_URL=https://ncdd-api.gov.kh
+      - NCDD_API_KEY=your-ncdd-api-key
+    depends_on:
+      - postgres
+
+  blazor-service:
+    build:
+      context: .
+      dockerfile: ./services/blazor-service/Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - ConnectionStrings:DefaultConnection=Host=postgres;Database=population;Username=population_user;Password=population_pass
+    depends_on:
+      - postgres
+
+  # API Gateway
+  api-gateway:
+    image: traefik:v2.10
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./infrastructure/api-gateway/traefik.yml:/etc/traefik/traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - node-service
+      - php-service
+      - python-service
+      - blazor-service
+
+volumes:
+  postgres_data:
